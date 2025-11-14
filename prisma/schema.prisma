@@ -1,0 +1,83 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String        @id @default(cuid())
+  email         String        @unique
+  firstName     String
+  lastName      String
+  password      String?       // Optional for Google sign-in users
+  provider      String        @default("email")
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  profile       Profile?
+  transactions  Transaction[]
+  budgets       Budget[]
+  nudges        Nudge[]
+}
+
+model Profile {
+  id                    String   @id @default(cuid())
+  userId                String   @unique
+  university            String
+  city                  String
+  currency              String   @default("USD")
+  stipendAmount         Float    // The actual stipend amount
+  disbursementFrequency String   // e.g. "monthly", "weekly", "bi-weekly"
+  savingsGoalPct        Float    // e.g. 20 means 20% of monthly income
+  lockedSavings         Float    @default(0)
+  weeks                 Int      @default(4)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  user                  User     @relation(fields: [userId], references: [id])
+}
+
+model Transaction {
+  id          String   @id @default(cuid())
+  userId      String
+  category    String
+  amount      Float
+  description String?
+  date        DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id])
+}
+
+model Budget {
+  id           String   @id @default(cuid())
+  userId       String
+  weekNumber   Int
+  totalBudget  Float
+  spentAmount  Float    @default(0)
+  startDate    DateTime
+  endDate      DateTime
+  isActive     Boolean  @default(false)
+  user         User     @relation(fields: [userId], references: [id])
+}
+
+model Nudge {
+  id        String   @id @default(cuid())
+  userId    String
+  ruleId    String
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  rule      Rule     @relation(fields: [ruleId], references: [id])
+}
+
+model Rule {
+  id              String  @id @default(cuid())
+  title           String
+  description     String
+  triggerType     String  // e.g. "spending_threshold"
+  thresholdPct    Float?  // e.g. 80 for "80% of budget spent"
+  messageTemplate String
+  isActive        Boolean @default(true)
+  nudges          Nudge[]
+}
