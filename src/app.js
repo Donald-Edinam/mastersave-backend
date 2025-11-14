@@ -9,6 +9,7 @@ const healthRoutes = require('./routes/health');
 const testDbRoutes = require('./routes/testDb');
 const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin');
+const profileRoutes = require('./routes/profile');
 const errorHandler = require('./middlewares/errorHandler');
 const notFound = require('./middlewares/notFound');
 const { specs, swaggerUi } = require('./config/swagger');
@@ -44,6 +45,7 @@ app.use('/health', healthRoutes);
 app.use('/test-db', testDbRoutes);
 app.use('/auth', authRoutes);
 app.use('/admin', adminRoutes);
+app.use('/profile', profileRoutes);
 
 // Error handling middleware (must be last)
 app.use(notFound);
