@@ -37,6 +37,7 @@ const authMiddleware = (req, res, next) => {
     req.user = {
       id: decoded.id,
       email: decoded.email,
+      role: decoded.role,
     };
 
     next();
@@ -64,4 +65,7 @@ const authMiddleware = (req, res, next) => {
   }
 };
 
-module.exports = authMiddleware;
+module.exports = {
+  verifyToken: authMiddleware,
+  authMiddleware
+};

@@ -7,6 +7,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum UserRole {
+  STUDENT
+  ADMIN
+}
+
 model User {
   id            String        @id @default(cuid())
   email         String        @unique
@@ -14,6 +19,7 @@ model User {
   lastName      String
   password      String?       // Optional for Google sign-in users
   provider      String        @default("email")
+  role          UserRole      @default(STUDENT)
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
   profile       Profile?
@@ -25,12 +31,12 @@ model User {
 model Profile {
   id                    String   @id @default(cuid())
   userId                String   @unique
-  university            String
-  city                  String
+  university            String   @default("Not specified")
+  city                  String   @default("Not specified")
   currency              String   @default("USD")
-  stipendAmount         Float    // The actual stipend amount
-  disbursementFrequency String   // e.g. "monthly", "weekly", "bi-weekly"
-  savingsGoalPct        Float    // e.g. 20 means 20% of monthly income
+  stipendAmount         Float    @default(0) // The actual stipend amount
+  disbursementFrequency String   @default("monthly") // e.g. "monthly", "weekly", "bi-weekly"
+  savingsGoalPct        Float    @default(20) // e.g. 20 means 20% of monthly income
   lockedSavings         Float    @default(0)
   weeks                 Int      @default(4)
   createdAt             DateTime @default(now())

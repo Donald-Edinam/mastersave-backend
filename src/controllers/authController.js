@@ -19,6 +19,7 @@ const signup = async (req, res) => {
       firstName, 
       lastName, 
       password, 
+      role = 'STUDENT',
       university, 
       city, 
       currency,
@@ -32,6 +33,14 @@ const signup = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: 'Email, password, firstName, and lastName are required',
+      });
+    }
+
+    // Validate role
+    if (!['STUDENT', 'ADMIN'].includes(role)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid role. Must be STUDENT or ADMIN',
       });
     }
 
@@ -59,6 +68,7 @@ const signup = async (req, res) => {
         lastName,
         password: hashedPassword,
         provider: 'email',
+        role,
         profile: university ? {
           create: {
             university: university || 'Not specified',
@@ -79,6 +89,7 @@ const signup = async (req, res) => {
     const token = generateToken({
       id: user.id,
       email: user.email,
+      role: user.role,
     });
 
     // Remove password from response
@@ -144,6 +155,7 @@ const login = async (req, res) => {
     const token = generateToken({
       id: user.id,
       email: user.email,
+      role: user.role,
     });
 
     // Remove password from response
